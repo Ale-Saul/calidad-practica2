@@ -3,8 +3,8 @@ from tkinter import ttk
 from tkinter import messagebox
 from sqlite3 import Error
 
-from database import Database
-from productselector import ProductSelector
+from .Database import Database
+from .productselector import ProductSelector
 
 
 class CreateOrders(tk.Toplevel):

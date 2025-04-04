@@ -7,7 +7,7 @@ import webbrowser
 
 from bs4 import BeautifulSoup
 
-from database import Database
+from .Database import Database
 
 
 class PrintOrders(tk.Toplevel):

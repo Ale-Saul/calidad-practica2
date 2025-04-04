@@ -4,12 +4,12 @@ from tkinter import ttk
 from PIL import ImageTk, Image
 from sqlite3 import Error
 
-from printorders import PrintOrders
-from configwindow import ConfigWindow
-from kitchenwindow import KitchenWindow
-from createorders import CreateOrders
-from aboutwindow import AboutWindow
-from database import Database
+from .printorders import PrintOrders
+from .configwindow import ConfigWindow
+from .kitchenwindow import KitchenWindow
+from .createorders import CreateOrders
+from .aboutwindow import AboutWindow
+from .Database import Database
 
 # basedir = os.path.dirname(__file__)
 # print(basedir)
