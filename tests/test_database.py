@@ -3,6 +3,7 @@ from unittest import mock
 from BASE.Components.Database import Database
 import os
 
+
 @pytest.fixture
 def mock_db():
     """Fixture que crea una instancia de Database con conexión y cursor mockeados"""
@@ -35,4 +36,16 @@ def test_read_val_success(mock_db):
     result = mock_db.read_val(test_query, test_value)
     
     assert result == [("test_value",)]
-    mock_db.cursor.execute.assert_called_once_with(test_query, test_value) 
+    mock_db.cursor.execute.assert_called_once_with(test_query, test_value)
+
+def test_read_val_without_where(mock_db):
+    """Prueba que read_val funciona correctamente sin cláusula WHERE"""
+    mock_db.cursor.fetchall.return_value = [("value1",), ("value2",)]
+    test_query = "SELECT * FROM test_table"
+    
+    mock_db.cursor.execute.reset_mock()
+    
+    result = mock_db.read_val(test_query)
+    
+    assert result == [("value1",), ("value2",)]
+    mock_db.cursor.execute.assert_called_once_with(test_query)
