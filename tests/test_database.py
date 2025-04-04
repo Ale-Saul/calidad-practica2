@@ -2,6 +2,7 @@ import pytest
 from unittest import mock
 from BASE.Components.Database import Database
 import os
+from sqlite3 import Error
 
 
 @pytest.fixture
@@ -49,3 +50,25 @@ def test_read_val_without_where(mock_db):
     
     assert result == [("value1",), ("value2",)]
     mock_db.cursor.execute.assert_called_once_with(test_query)
+
+def test_read_val_error(mock_db):
+    """Prueba que read_val maneja correctamente los errores"""
+    mock_db.cursor.execute.side_effect = Error("Test error")
+    
+    result = mock_db.read_val("SELECT * FROM test_table")
+    
+    assert result is None
+
+def test_create_table_success(mock_db):
+    """Prueba que create_table crea una tabla correctamente"""
+    test_query = "CREATE TABLE test_table (id INTEGER PRIMARY KEY, name TEXT)"
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.create_table(test_query)
+    
+    # Verificar que se llamó a execute y commit
+    mock_db.cursor.execute.assert_called_once_with(test_query)
+    mock_db.conn.commit.assert_called_once()
