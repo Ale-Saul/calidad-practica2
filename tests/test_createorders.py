@@ -41,4 +41,10 @@ def test_clear(create_orders):
     assert len(create_orders.order_ls) == 0
     assert create_orders.tb_name_entry.get() == ""
     mock_order.destroy_all.assert_called_once()
-    
+
+def test_send_to_kitchen_empty_table(create_orders):
+    with patch('tkinter.messagebox.showerror') as mock_error:
+        result = create_orders.send_to_kitchen()
+        assert result is None
+        mock_error.assert_called_once_with("Empty Fields", "Please enter a valid table number!")
+
