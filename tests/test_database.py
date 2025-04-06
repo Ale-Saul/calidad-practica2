@@ -101,3 +101,15 @@ def test_insert_spec_config_success(mock_db):
     mock_db.cursor.execute.assert_called_once_with(test_query, test_values)
     mock_db.conn.commit.assert_called_once()
 
+def test_insert_spec_config_error(mock_db):
+    """Prueba que insert_spec_config maneja correctamente los errores"""
+    mock_db.cursor.execute.side_effect = Error("Test error")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.insert_spec_config("INSERT INTO test_table VALUES (?)", (1,))
+    
+    # Verificar que no se llamó a commit cuando hay error
+    mock_db.conn.commit.assert_not_called()
