@@ -42,12 +42,13 @@ def test_clear(create_orders):
     assert create_orders.tb_name_entry.get() == ""
     mock_order.destroy_all.assert_called_once()
 
-def test_send_to_kitchen(create_orders):
+def test_send_to_kitchen_empty_table(create_orders):
     with patch('tkinter.messagebox.showerror') as mock_error:
         result = create_orders.send_to_kitchen()
         assert result is None
         mock_error.assert_called_once_with("Empty Fields", "Please enter a valid table number!")
-     
+
+def test_send_to_kitchen_success(create_orders):        
     mock_order = MagicMock()
     mock_order.retrieve_data.return_value = ['Carne', '2']
     create_orders.order_ls = [mock_order]
@@ -66,3 +67,8 @@ def test_add_records(create_orders):
         mock_read.return_value = [(1,)]
         create_orders.add_records(test_orders)
         mock_read.assert_called()
+
+def test_retrieve_fac_info(create_orders):
+    fac_name, max_tables = create_orders.retrieve_fac_info()
+    assert fac_name == 'Test restaurante'
+    assert max_tables == 10
