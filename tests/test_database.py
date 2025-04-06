@@ -72,3 +72,16 @@ def test_create_table_success(mock_db):
     # Verificar que se llamó a execute y commit
     mock_db.cursor.execute.assert_called_once_with(test_query)
     mock_db.conn.commit.assert_called_once()
+
+def test_create_table_error(mock_db):
+    """Prueba que create_table maneja correctamente los errores"""
+    mock_db.cursor.execute.side_effect = Error("Test error")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.create_table("CREATE TABLE test_table (id INTEGER PRIMARY KEY)")
+    
+    # Verificar que no se llamó a commit cuando hay error
+    mock_db.conn.commit.assert_not_called()
