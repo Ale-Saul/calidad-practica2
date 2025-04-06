@@ -58,3 +58,11 @@ def test_send_to_kitchen(create_orders):
             mock_read.return_value = [(1,)]  
             create_orders.send_to_kitchen()
             assert len(create_orders.order_ls) == 0
+
+def test_add_records(create_orders):
+    test_orders = [(('Carne', '2'), '5')]
+    
+    with patch.object(create_orders.fac_db, 'read_val') as mock_read:
+        mock_read.return_value = [(1,)]
+        create_orders.add_records(test_orders)
+        mock_read.assert_called()
