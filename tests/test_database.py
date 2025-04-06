@@ -85,3 +85,19 @@ def test_create_table_error(mock_db):
     
     # Verificar que no se llamó a commit cuando hay error
     mock_db.conn.commit.assert_not_called()
+
+def test_insert_spec_config_success(mock_db):
+    """Prueba que insert_spec_config inserta datos correctamente"""
+    test_query = "INSERT INTO test_table (id, name) VALUES (?, ?)"
+    test_values = (1, "test_name")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.insert_spec_config(test_query, test_values)
+    
+    # Verificar que se llamó a execute y commit
+    mock_db.cursor.execute.assert_called_once_with(test_query, test_values)
+    mock_db.conn.commit.assert_called_once()
+
