@@ -157,3 +157,15 @@ def test_delete_val_success(mock_db):
     mock_db.cursor.execute.assert_called_once_with(test_query, test_id)
     mock_db.conn.commit.assert_called_once()
 
+def test_delete_val_error(mock_db):
+    """Prueba que delete_val maneja correctamente los errores"""
+    mock_db.cursor.execute.side_effect = Error("Test error")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.delete_val("DELETE FROM test_table WHERE id = ?", 1)
+    
+    # Verificar que no se llamó a commit cuando hay error
+    mock_db.conn.commit.assert_not_called() 
