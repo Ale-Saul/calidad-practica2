@@ -30,7 +30,9 @@ def test_callback_table_num(create_orders):
     
     with patch('tkinter.messagebox.showerror') as mock_error:
         assert create_orders.callback_table_num("11") == False
-        mock_error.assert_called_once()
+        assert create_orders.callback_table_num("-1") == False
+        assert create_orders.callback_table_num("abc") == False
+        mock_error.assert_called()
 
 def test_clear(create_orders):
     mock_order = MagicMock()
@@ -72,3 +74,4 @@ def test_retrieve_fac_info(create_orders):
     fac_name, max_tables = create_orders.retrieve_fac_info()
     assert fac_name == 'Test restaurante'
     assert max_tables == 10
+    
