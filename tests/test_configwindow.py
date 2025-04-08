@@ -32,18 +32,17 @@ def test_validate_product_empty_name_shows_warning(config_window, mocker):
     assert result is False
     spy.assert_called_once_with("Advertencia", "Por favor ingrese el nombre del producto")
 
-#Test 3: Simular inserción y verificar que se ejecuta el INSERT o UPDATE
+#Test 3: Guardar configuración en DB correctamente
 def test_save_product_executes_insert_or_update(config_window, mocker):
     # Datos de prueba
     config_window.name_entry.get = Mock(return_value="Pizza")
     config_window.price_entry.get = Mock(return_value="15000")
 
-    # Simular un producto nuevo (puedes ajustar según cómo identifiques si es nuevo o existente)
     config_window.editing_product = None
 
     # Espiar la ejecución del SQL
     spy_execute = mocker.spy(config_window.cursor, "execute")
-    mocker.patch("tkinter.messagebox.showinfo")  # Evita que muestre ventanas
+    mocker.patch("tkinter.messagebox.showinfo")
 
     config_window.save_product()
 
@@ -51,3 +50,16 @@ def test_save_product_executes_insert_or_update(config_window, mocker):
     assert spy_execute.call_count >= 1
     called_sql = spy_execute.call_args[0][0].lower()
     assert "insert" in called_sql or "update" in called_sql
+
+#Test 4: Seleccionar producto lo muestra en la interfaz
+def test_treeview_select_updates_selected_label(config_window, mocker):
+    item_id = config_window.product_tree.insert('', 'end', values=("Pizza", "15000"))
+
+    config_window.product_tree.selection_set(item_id)
+
+    fake_event = Mock()
+    fake_event.widget = config_window.product_tree
+
+    config_window.on_treeview_select(fake_event)
+
+    assert config_window.selected_label.cget("text") == "Producto seleccionado: Pizza"
