@@ -63,3 +63,15 @@ def test_treeview_select_updates_selected_label(config_window, mocker):
     config_window.on_treeview_select(fake_event)
 
     assert config_window.selected_label.cget("text") == "Producto seleccionado: Pizza"
+
+#Test 5: Validar precio del producto no excede 10 millones
+def test_validate_product_high_price_shows_error(config_window, mocker):
+    name = "Pizza Especial"
+    high_price = "10000001"
+
+    spy = mocker.patch("tkinter.messagebox.showerror")
+
+    result = config_window.validate_product(high_price, name)
+
+    assert result is False
+    spy.assert_called_once_with("Error", "El precio debe estar entre 1 y 10,000,000")
