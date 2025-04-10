@@ -115,3 +115,14 @@ def test_callback_table_num_invalid(mock_print_orders):
         mock_showerror.assert_called_once_with(
             "Input Error", "Maximum number of tables must not exceed 10!"
         )
+
+def test_retrieve_fac_info(mock_print_orders):
+    """Prueba que retrieve_fac_info devuelve los valores correctos"""
+    # Simular los valores que devuelve la base de datos
+    mock_print_orders.fac_db.read_val.return_value = [("Address", "Test Restaurant", "Phone", 10)]
+    
+    # Llamar a la función
+    result = mock_print_orders.retrieve_fac_info()
+    
+    # Verificar que se devuelve el nombre y el número de mesas correctos
+    assert result == ("Test Restaurant", 10)
