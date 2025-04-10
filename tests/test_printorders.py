@@ -204,3 +204,21 @@ def test_clear_all_with_children(mock_print_orders):
     mock_print_orders.tr_view.delete.assert_has_calls(expected_calls, any_order=False)
     # Verificar que se desactiva el botón
     mock_print_orders.print_receipt_btn.config.assert_called_once_with(state=tk.DISABLED)
+
+def test_clear_all_without_children(mock_print_orders):
+    """Prueba que clear_all limpia correctamente el Treeview cuando no tiene elementos."""
+    # Configurar mocks
+    mock_print_orders.tb_name_entry.delete = mock.Mock()
+    # Simular que el Treeview no tiene elementos
+    mock_print_orders.tr_view.get_children.return_value = []
+    mock_print_orders.tr_view.delete = mock.Mock()
+    # Ejecutar clear_all
+    mock_print_orders.clear_all()
+    
+    # Verificar que se eliminó el contenido del entry
+    mock_print_orders.tb_name_entry.delete.assert_called_once_with(0, tk.END)
+    # Verificar que tr_view.delete no se llamó ya que no hay elementos
+    mock_print_orders.tr_view.delete.assert_not_called()
+    # Verificar que se desactiva el botón
+    mock_print_orders.print_receipt_btn.config.assert_called_once_with(state=tk.DISABLED)
+
