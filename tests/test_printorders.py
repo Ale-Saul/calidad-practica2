@@ -18,3 +18,21 @@ def mock_print_orders():
             orders.fac_info = ("Test Restaurant", 10)
             orders.fac_db = mock.Mock()
             return orders
+
+def test_load_orders_success(mock_print_orders):
+    """Prueba la carga exitosa de órdenes"""
+    # Configurar los mocks
+    mock_print_orders.tb_name_entry.get.return_value = "1"
+    mock_print_orders.fac_db.read_val.return_value = [
+        (1, "Product1", 2, 20.0),
+        (2, "Product2", 1, 15.0)
+    ]
+    
+    mock_print_orders.load_orders()
+    
+    # Verificar que se activó el botón de impresión
+    mock_print_orders.print_receipt_btn.config.assert_called_with(state='active')
+    # Verificar que se llamó a read_val con los parámetros correctos
+    mock_print_orders.fac_db.read_val.assert_called_once()
+    # Verificar que se insertaron los datos en el Treeview
+    assert mock_print_orders.tr_view.insert.call_count == 2
