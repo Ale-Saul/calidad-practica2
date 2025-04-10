@@ -37,6 +37,23 @@ def test_load_orders_success(mock_print_orders):
     # Verificar que se insertaron los datos en el Treeview
     assert mock_print_orders.tr_view.insert.call_count == 2
 
+def test_load_orders_empty_table(mock_print_orders):
+    """Prueba el manejo cuando no se ingresa número de mesa"""
+    # Configurar los mocks
+    mock_print_orders.tb_name_entry.get.return_value = ""
+    
+    # Mockear messagebox antes de llamar a load_orders
+    with mock.patch('BASE.Components.printorders.messagebox') as mock_messagebox:
+        mock_print_orders.load_orders()
+        
+        # Verificar que se mostró el mensaje de error
+        mock_messagebox.showerror.assert_called_once()
+        # Verificar que se desactivó el botón de impresión
+        mock_print_orders.print_receipt_btn.config.assert_called_with(state='disabled')
+        # Verificar que no se llamó a read_val
+        mock_print_orders.fac_db.read_val.assert_not_called()
+
+
 def test_load_orders_no_orders(mock_print_orders):
     """Prueba el manejo cuando no hay órdenes para la mesa"""
     # Configurar los mocks
