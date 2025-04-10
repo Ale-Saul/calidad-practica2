@@ -98,3 +98,20 @@ def test_callback_table_num_valid(mock_print_orders):
     assert mock_print_orders.callback_table_num("5") == True
     assert mock_print_orders.callback_table_num("10") == True
 
+def test_callback_table_num_invalid(mock_print_orders):
+    """Prueba que callback_table_num rechaza números de mesa inválidos sin mostrar (pop-up) el messagebox real"""
+    # Configurar los mocks
+    mock_print_orders.fac_info = ("Test Restaurant", 10)
+    
+    # Mockear messagebox para evitar que se muestre el diálogo real
+    with mock.patch('BASE.Components.printorders.messagebox.showerror') as mock_showerror:
+        # Verificar que los números de mesa inválidos son rechazados
+        result = mock_print_orders.callback_table_num("11")
+        
+        # Verificar que la función devuelve False
+        assert result == False
+        
+        # Verificar que se llamó a showerror exactamente una vez con los argumentos esperados
+        mock_showerror.assert_called_once_with(
+            "Input Error", "Maximum number of tables must not exceed 10!"
+        )
