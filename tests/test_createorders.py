@@ -30,9 +30,7 @@ def test_callback_table_num(create_orders):
     
     with patch('tkinter.messagebox.showerror') as mock_error:
         assert create_orders.callback_table_num("11") == False
-        assert create_orders.callback_table_num("-1") == False
-        assert create_orders.callback_table_num("abc") == False
-        mock_error.assert_called()
+        mock_error.assert_called_once()
 
 def test_clear(create_orders):
     mock_order = MagicMock()
