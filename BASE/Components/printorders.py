@@ -166,8 +166,8 @@ class PrintOrders(tk.Toplevel):
 
         with open("order_template.html") as html_doc:
             doc = BeautifulSoup(html_doc, 'html.parser')
-            doc.find(text="Fac_name").replace_with(f"\"{self.fac_info[0]}\"")
-            doc.find(text="t_num").replace_with(f"Table №{self.t_num}")
+            doc.find(string="Fac_name").replace_with(f"\"{self.fac_info[0]}\"")
+            doc.find(string="t_num").replace_with(f"Table №{self.t_num}")
             for tag in tags:
                 doc.div.append(tag[0])
                 doc.div.append(tag[1])

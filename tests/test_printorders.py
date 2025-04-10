@@ -126,3 +126,37 @@ def test_retrieve_fac_info(mock_print_orders):
     
     # Verificar que se devuelve el nombre y el número de mesas correctos
     assert result == ("Test Restaurant", 10)
+
+def test_print_receipt_valid_orders(mock_print_orders):
+    """Prueba que print_receipt genera correctamente el recibo cuando hay órdenes válidas."""
+    # Configurar el valor de t_num
+    mock_print_orders.t_num = "1"
+
+    # Simular que el Treeview tiene dos elementos
+    mock_print_orders.tr_view.get_children.return_value = ["child1", "child2"]
+
+    # Definir el comportamiento de tr_view.item para cada hijo
+    def item_side_effect(child):
+        if child == "child1":
+            # Valores: id, product name, quantity, price (en formato de string para el precio)
+            return {"values": [1, "Product1", 2, "20.00"]}
+        elif child == "child2":
+            return {"values": [2, "Product2", 1, "15.00"]}
+    mock_print_orders.tr_view.item.side_effect = item_side_effect
+
+    # Preparar un contenido de plantilla HTML de ejemplo
+    sample_template = '<html><body><div>Fac_name</div><div>t_num</div></body></html>'
+    m_open = mock.mock_open(read_data=sample_template)
+
+    with mock.patch("builtins.open", m_open):
+        with mock.patch("webbrowser.open_new_tab") as mock_open_tab:
+            with mock.patch.object(mock_print_orders, "clear_all") as mock_clear_all:
+                # Ejecutar print_receipt
+                mock_print_orders.print_receipt()
+                
+                # Verificar que se abrió el archivo para escritura con el nombre esperado
+                m_open.assert_any_call("order_1.html", "w+", encoding='utf-8')
+                # Verificar que se llamó a webbrowser.open_new_tab con el nombre del archivo
+                mock_open_tab.assert_called_once_with("order_1.html")
+                # Verificar que clear_all fue llamado al finalizar
+                mock_clear_all.assert_called_once()
