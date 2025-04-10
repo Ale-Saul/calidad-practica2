@@ -70,3 +70,22 @@ def test_load_orders_no_orders(mock_print_orders):
         mock_print_orders.print_receipt_btn.config.assert_called_with(state='disabled')
         # Verificar que se llamó a read_val
         mock_print_orders.fac_db.read_val.assert_called_once()
+
+def test_load_orders_database_error(mock_print_orders):
+    """Prueba el manejo de errores de base de datos"""
+    # Configurar los mocks
+    mock_print_orders.tb_name_entry.get.return_value = "1"
+    mock_print_orders.fac_db.read_val.side_effect = Error("Error de base de datos")
+    
+    # Mockear print para capturar el error
+    with mock.patch('builtins.print') as mock_print:
+        # Mockear messagebox para evitar que se muestre el diálogo
+        with mock.patch('BASE.Components.printorders.messagebox'):
+            mock_print_orders.load_orders()
+            
+            # Verificar que se imprimió el error
+            assert mock_print.call_count == 1
+            assert str(mock_print.call_args[0][0]) == "Error de base de datos"
+            # Verificar que el botón de impresión no se modificó
+            mock_print_orders.print_receipt_btn.config.assert_not_called()
+
