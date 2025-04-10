@@ -89,3 +89,12 @@ def test_load_orders_database_error(mock_print_orders):
             # Verificar que el botón de impresión no se modificó
             mock_print_orders.print_receipt_btn.config.assert_not_called()
 
+def test_callback_table_num_valid(mock_print_orders):
+    """Prueba que callback_table_num acepta números de mesa válidos"""
+    # Configurar los mocks
+    mock_print_orders.fac_info = ("Test Restaurant", 10)
+    
+    # Verificar que los números de mesa válidos pasan
+    assert mock_print_orders.callback_table_num("5") == True
+    assert mock_print_orders.callback_table_num("10") == True
+
