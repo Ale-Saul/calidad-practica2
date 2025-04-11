@@ -129,3 +129,38 @@ def test_callback_seats_valid(config_window):
 def test_callback_seats_invalid(config_window):
     config_window.fc_table_num_ent.get.return_value = "5"
     assert config_window.callback_seats("45") is False
+
+#Test 1: Precio y Nombre Válidos
+def test_valid_price_and_name(config_window):
+    assert config_window.validate_product("500", "Pizza") is True
+
+#Test 2: Precio Alto con Confirmación del Usuario
+def test_high_price_user_accepts(config_window, mocker):
+    mocker.patch('tkinter.messagebox.askyesno', return_value=True)
+    assert config_window.validate_product("10000001", "Burger") is True
+
+#Test 3: Precio Alto con Rechazo del Usuario
+def test_high_price_user_rejects(config_window, mocker):
+    mocker.patch('tkinter.messagebox.askyesno', return_value=False)
+    config_window.food_price_entry.insert(0, "10000001")
+    assert config_window.validate_product("10000001", "Burger") is False
+    assert config_window.food_price_entry.get() == ""
+
+#Test 4: Precio Alto y Nombre Largo
+def test_high_price_and_long_name(config_window, mocker):
+    mocker.patch('tkinter.messagebox.showerror')
+    config_window.food_price_entry.insert(0, "10000001")
+    config_window.food_name_entry.insert(0, "hamburguesa con queso y papas.")
+    assert config_window.validate_product("10000001", "hamburguesa con queso y papas") is False
+    assert config_window.food_price_entry.get() == ""
+    assert config_window.food_name_entry.get() == ""
+
+#Test 5: Precio No Numérico
+def test_non_float_price(config_window, mocker):
+    mocker.patch('tkinter.messagebox.showerror')
+    assert config_window.validate_product("not_a_float", "Pizza") is False
+
+#Test 6: Nombre Demasiado Largo
+def test_long_name(config_window, mocker):
+    mocker.patch('tkinter.messagebox.showerror')
+    assert config_window.validate_product("500", "Nombre > 20 caracteres...") is False
