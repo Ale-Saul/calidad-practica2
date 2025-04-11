@@ -164,3 +164,47 @@ def test_non_float_price(config_window, mocker):
 def test_long_name(config_window, mocker):
     mocker.patch('tkinter.messagebox.showerror')
     assert config_window.validate_product("500", "Nombre > 20 caracteres...") is False
+
+#Test 1: Insertar en DB Vacía
+def test_insert_new_config(config_window, mock_db):
+    mock_db.read_val.return_value = []
+    config_window.fc_name_ent.get = MagicMock(return_value="A")
+    config_window.fc_table_num_ent.get = MagicMock(return_value="1")
+    config_window.fc_seat_num_ent.get = MagicMock(return_value="2")
+    config_window.save_fac_config()
+    mock_db.insert_spec_config.assert_called_once_with(
+        "INSERT INTO fac_config VALUES (?, ?, ?, ?)",
+        (1, "A", "1", "2")
+    )
+
+#Test 2: Actualizar DB Existente
+def test_update_existing_config(config_window, mock_db):
+    mock_db.read_val.return_value = [(1, "Old", 1, 2)]
+    config_window.fc_name_ent = MagicMock()
+    config_window.fc_table_num_ent = MagicMock()
+    config_window.fc_seat_num_ent = MagicMock()
+    config_window.fc_name_ent.get.return_value = "B"
+    config_window.fc_table_num_ent.get.return_value = "3"
+    config_window.fc_seat_num_ent.get.return_value = "4"
+    config_window.save_fac_config()
+    mock_db.update.assert_called_once_with(
+        "UPDATE fac_config SET fac_name = ?, table_num = ?, seat_num = ? WHERE id = ?",
+        ("B", "3", "4", 1)
+    )
+
+#Test 3: Campos Inválidos
+def test_invalid_fields_error(config_window, mock_db, mocker):
+    mock_showerror = mocker.patch('tkinter.messagebox.showerror')
+    config_window.fc_name_ent = MagicMock()
+    config_window.fc_table_num_ent = MagicMock()
+    config_window.fc_seat_num_ent = MagicMock()
+    config_window.fc_name_ent.get.return_value = ""
+    config_window.fc_table_num_ent.get.return_value = "1"
+    config_window.fc_seat_num_ent.get.return_value = ""
+    config_window.save_fac_config()
+    mock_showerror.assert_called_once_with(
+        "Empty input fields",
+        "Please enter facility name, table number and seat number accordingly!"
+    )
+    mock_db.insert_spec_config.assert_not_called()
+    mock_db.update.assert_not_called()

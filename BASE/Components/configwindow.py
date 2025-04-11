@@ -336,7 +336,7 @@ class ConfigWindow(tk.Toplevel):
             return False
 
     def save_fac_config(self):
-        load_query = """SELECT * FROM fac_config"""
+        load_query = "SELECT * FROM fac_config"
         result = self.fac_db.read_val(load_query)
 
         fac_name = self.fc_name_ent.get()
@@ -345,18 +345,12 @@ class ConfigWindow(tk.Toplevel):
 
         if fac_name and table_num and seat_num:
             if len(result) >= 1:
-                update_query = """UPDATE fac_config
-                SET fac_name = ?,
-                table_num = ?,
-                seat_num = ?,
-                WHERE id = ?
-                """
-                self.fac_db.update(
-                    update_query, (fac_name, table_num, seat_num, 1))
+                update_query = "UPDATE fac_config SET fac_name = ?, table_num = ?, seat_num = ? WHERE id = ?"
+                self.fac_db.update(update_query, (fac_name, table_num, seat_num, 1))
             else:
-                spec_insert_query = """INSERT INTO fac_config VALUES (?, ?, ?, ?)"""
-                self.fac_db.insert_spec_config(
-                    spec_insert_query, (1, fac_name, table_num, seat_num))
+                spec_insert_query = "INSERT INTO fac_config VALUES (?, ?, ?, ?)"
+                self.fac_db.insert_spec_config(spec_insert_query, (1, fac_name, table_num, seat_num))
+
             self.check_if_empty_database()
             self.check_if_empty_fc_entry()
         else:
