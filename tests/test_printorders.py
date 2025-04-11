@@ -289,3 +289,10 @@ def test_html_order(mock_print_orders):
     assert tag_name.get_text(strip=True) == name
     assert tag_quantity.get_text(strip=True) == f"x{quantity}"
     assert tag_price.get_text(strip=True) == price
+
+def test_destroy_calls_super_destroy(mock_print_orders):
+    """Prueba que destroy llama al método destroy de la clase base."""
+    # Se puede hacer un patch en el objeto super y comprobar que se llama
+    with mock.patch.object(type(mock_print_orders), 'destroy', autospec=True) as mock_super_destroy:
+        mock_print_orders.destroy()
+        mock_super_destroy.assert_called_once_with(mock_print_orders)
