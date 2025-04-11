@@ -99,7 +99,7 @@ def test_product_selected_valid(config_window):
     assert "1) Pizza 10.5" in str(config_window.sel_pr_id_lbl.cget("text"))
     assert str(config_window.tr_view_remove["state"]) == "normal"
 
-
+#Test 2: Selección Inválida
 def test_product_selected_empty(config_window, capsys, mocker):
     mocker.patch.object(config_window.tr_view, 'selection', return_value=())
     config_window.tr_view_remove.config(state=tk.NORMAL)
@@ -110,3 +110,11 @@ def test_product_selected_empty(config_window, capsys, mocker):
     assert "index out of range" in captured.out.lower()
     assert config_window.tr_view_remove.instate(['disabled']), "El botón no se desactivó"
     assert config_window.sel_pr_id_lbl.cget("text") == ""
+
+#Test 1: número válido dentro del rango o cadena vacía
+def test_callback_table_valid(config_window):
+    assert config_window.callback_table("25") is True
+
+#Test 2: número mayor a 50 o entrada no válida
+def test_callback_table_invalid(config_window):
+    assert config_window.callback_table("100") is False
