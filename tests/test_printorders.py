@@ -259,3 +259,33 @@ def test_clear_all_without_children(mock_print_orders):
     mock_print_orders.tr_view.delete.assert_not_called()
     # Verificar que se desactiva el botón
     mock_print_orders.print_receipt_btn.config.assert_called_once_with(state=tk.DISABLED)
+
+def test_html_order(mock_print_orders):
+    """Prueba que html_order genera los fragmentos HTML correctos para un producto."""
+    # Parámetros de ejemplo
+    top_pad = 1
+    name = "Product1"
+    quantity = 2
+    price = "20.00"
+    result = mock_print_orders.html_order(top_pad, name, quantity, price)
+
+    # Extraer las tres instancias de BeautifulSoup
+    soup_name, soup_quantity, soup_price = result
+
+    # Calcular el valor esperado de 'top' (150 + top_pad*20)
+    expected_top = 150 + (top_pad * 20)  # 150 + 20 = 170
+
+    # Buscar el tag <span> en cada fragmento (por si se envolvió en <html><body>...)
+    tag_name = soup_name.find('span')
+    tag_quantity = soup_quantity.find('span')
+    tag_price = soup_price.find('span')
+
+    # Verificar que se incluya el estilo con top esperado
+    assert f"top:{expected_top}pt;" in tag_name.get("style", "")
+    assert f"top:{expected_top}pt;" in tag_quantity.get("style", "")
+    assert f"top:{expected_top}pt;" in tag_price.get("style", "")
+
+    # Verificar que los textos sean correctos (usando get_text(strip=True) para eliminar espacios y saltos de línea)
+    assert tag_name.get_text(strip=True) == name
+    assert tag_quantity.get_text(strip=True) == f"x{quantity}"
+    assert tag_price.get_text(strip=True) == price
