@@ -15,6 +15,7 @@ def config_window(mock_db):
     with patch('tkinter.messagebox'):
         win = ConfigWindow(root, lambda: None)
         win.fac_db = mock_db
+        win.fc_table_num_ent = MagicMock()
         yield win
     root.destroy()
 
@@ -118,3 +119,13 @@ def test_callback_table_valid(config_window):
 #Test 2: número mayor a 50 o entrada no válida
 def test_callback_table_invalid(config_window):
     assert config_window.callback_table("100") is False
+
+#Test 1: número válido dentro del rango o cadena vacía
+def test_callback_seats_valid(config_window):
+    config_window.fc_table_num_ent.get.return_value = "5"
+    assert config_window.callback_seats("40") is True
+
+#Test 2: número mayor al máximo o entrada no válida
+def test_callback_seats_invalid(config_window):
+    config_window.fc_table_num_ent.get.return_value = "5"
+    assert config_window.callback_seats("45") is False
