@@ -283,9 +283,11 @@ class ConfigWindow(tk.Toplevel):
             sel_pr_txt = f"{sel_item_val[0]}) {sel_item_val[1]} {sel_item_val[2]}"
             self.sel_pr_id_lbl.config(text="")
             self.sel_pr_id_lbl.config(text=sel_pr_txt)
-            self.tr_view_remove.config(state=tk.ACTIVE)
+            self.tr_view_remove.config(state=tk.NORMAL)
         except IndexError as e:
             print(e)
+            self.tr_view_remove.config(state=tk.DISABLED)
+            self.sel_pr_id_lbl.config(text="")
 
     def fac_conf_clear(self):
         self.fc_name_ent.delete(0, tk.END)
