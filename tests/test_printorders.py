@@ -90,6 +90,44 @@ def test_load_orders_database_error(mock_print_orders):
             # Verificar que el botón de impresión no se modificó
             mock_print_orders.print_receipt_btn.config.assert_not_called()
 
+def test_load_orders_loop(mock_print_orders):
+    """Prueba que load_orders ejecuta correctamente el bucle cuando se retornan múltiples órdenes."""
+    # Configurar el valor del número de mesa
+    mock_print_orders.tb_name_entry.get.return_value = "1"
+    
+    # Simular que la base de datos retorna tres órdenes
+    orders_result = [
+        (1, "Product1", 2, 20.0),
+        (2, "Product2", 1, 15.0),
+        (3, "Product3", 3, 30.0)
+    ]
+    mock_print_orders.fac_db.read_val.return_value = orders_result
+
+    # Asegurarse de que insert esté limpio (resetear llamadas previas)
+    mock_print_orders.tr_view.insert.reset_mock()
+
+    # Ejecutar load_orders (que es la función a probar)
+    mock_print_orders.load_orders()
+
+    # Verificar que se llamó a fac_db.read_val una vez
+    mock_print_orders.fac_db.read_val.assert_called_once()
+    
+    # Verificar que por cada orden se llamó a tr_view.insert, es decir, 3 veces
+    assert mock_print_orders.tr_view.insert.call_count == 3
+
+    # Verificar que cada llamada a tr_view.insert fue con los valores esperados
+    expected_calls = [
+        mock.call("", tk.END, values=(1, "Product1", 2, f"{20.0:.2f}")),
+        mock.call("", tk.END, values=(2, "Product2", 1, f"{15.0:.2f}")),
+        mock.call("", tk.END, values=(3, "Product3", 3, f"{30.0:.2f}"))
+    ]
+    mock_print_orders.tr_view.insert.assert_has_calls(expected_calls, any_order=False)
+
+    # Verificar que se configuró el botón de impresión a 'active'
+    mock_print_orders.print_receipt_btn.config.assert_called_once_with(state='active')
+
+
+
 def test_callback_table_num_valid(mock_print_orders):
     """Prueba que callback_table_num acepta números de mesa válidos"""
     # Configurar los mocks
@@ -221,4 +259,3 @@ def test_clear_all_without_children(mock_print_orders):
     mock_print_orders.tr_view.delete.assert_not_called()
     # Verificar que se desactiva el botón
     mock_print_orders.print_receipt_btn.config.assert_called_once_with(state=tk.DISABLED)
-
