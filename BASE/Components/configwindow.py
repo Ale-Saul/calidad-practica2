@@ -394,6 +394,8 @@ class ConfigWindow(tk.Toplevel):
 
                 self.fac_db.insert_spec_config(
                     spec_insert_query, (pr_ind, food_name, food_price))
+            else:
+                messagebox.showerror("Invalid input", "Producto inválido.")
         else:
             er_msg = "Please fill \"Name of the product \" and \"Price of the product\" fields!"
             messagebox.showerror("Empty input fields", er_msg)

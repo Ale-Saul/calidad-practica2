@@ -208,3 +208,42 @@ def test_invalid_fields_error(config_window, mock_db, mocker):
     )
     mock_db.insert_spec_config.assert_not_called()
     mock_db.update.assert_not_called()
+
+#Test 1: Inserción Exitosa
+def test_add_valid_product(config_window, mock_db, mocker):
+    mocker.patch.object(config_window, 'validate_product', return_value=True)
+    mocker.patch.object(config_window, 'get_product_id', return_value=1)
+    config_window.food_name_entry.insert(0, "Pizza")
+    config_window.food_price_entry.insert(0, "10.5")
+    config_window.add_record()
+    mock_db.insert_spec_config.assert_called_once_with(
+        "INSERT INTO menu_config VALUES (?, ?, ?)",
+        (1, "Pizza", "10.5")
+    )
+    assert len(config_window.tr_view.get_children()) == 1
+
+#Test 2: Validación Fallida
+def test_add_invalid_product(config_window, mock_db, mocker):
+    # Mockear validate_product para que devuelva False
+    mocker.patch.object(config_window, 'validate_product', return_value=False)
+    mock_showerror = mocker.patch('BASE.Components.configwindow.messagebox.showerror')
+    config_window.food_name_entry = MagicMock()
+    config_window.food_price_entry = MagicMock()
+    config_window.food_name_entry.get.return_value = "Pizza"
+    config_window.food_price_entry.get.return_value = "10000001"
+    config_window.add_record()
+    mock_db.insert_spec_config.assert_not_called()
+    mock_showerror.assert_called_once()
+
+#Test 3: Campos Vacíos
+def test_add_empty_fields(config_window, mock_db, mocker):
+    mock_showerror = mocker.patch('BASE.Components.configwindow.messagebox.showerror')
+    config_window.food_name_entry = MagicMock()
+    config_window.food_price_entry = MagicMock()
+    config_window.food_name_entry.get.return_value = ""
+    config_window.food_price_entry.get.return_value = ""
+    config_window.add_record()
+    mock_showerror.assert_called_once_with(
+        "Empty input fields",
+        'Please fill "Name of the product " and "Price of the product" fields!'
+    )
