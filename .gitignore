@@ -1,3 +1,4 @@
 /BASE/Components/__pycache__
-
+venv/
+/tests/__pycache__
 *.db
