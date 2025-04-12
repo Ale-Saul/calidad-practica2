@@ -74,12 +74,17 @@ def test_complete_data(config_window, mock_db):
     assert str(config_window.fc_load_btn["state"]) == "active"
 
 #Test 1: Campos llenos
-def test_fc_entry_all_fields_filled(config_window):
-    config_window.fc_name_ent.insert(0, "Test")
-    config_window.fc_table_num_ent.insert(0, "5")
-    config_window.fc_seat_num_ent.insert(0, "10")
+def test_fc_entry_all_fields_filled(config_window, mocker):
+    config_window.fc_name_ent = MagicMock()
+    config_window.fc_table_num_ent = MagicMock()
+    config_window.fc_seat_num_ent = MagicMock()
+    config_window.fc_name_ent.get.return_value = "Test"
+    config_window.fc_table_num_ent.get.return_value = "5"
+    config_window.fc_seat_num_ent.get.return_value = "10"
+    config_window.fc_clear_btn = MagicMock()
     config_window.check_if_empty_fc_entry()
-    assert str(config_window.fc_clear_btn["state"]) == "active"
+    config_window.fc_clear_btn.config.assert_called_once_with(state="active")
+
 
 #Test 2: Campos vacíos
 def test_fc_entry_missing_fields(config_window):
@@ -247,3 +252,18 @@ def test_add_empty_fields(config_window, mock_db, mocker):
         "Empty input fields",
         'Please fill "Name of the product " and "Price of the product" fields!'
     )
+
+#Test 1: Entrada None
+def test_is_float_none(config_window):
+    assert config_window.is_float(None) is False
+
+#Test 2: Float Válido
+def test_is_float_valid(config_window):
+    assert config_window.is_float("10.5") is True
+    assert config_window.is_float("5") is True
+    assert config_window.is_float("-3.14") is True
+
+#Test 3: No Float
+def test_is_float_invalid(config_window):
+    assert config_window.is_float("abc") is False
+    assert config_window.is_float("10.5.5") is False
