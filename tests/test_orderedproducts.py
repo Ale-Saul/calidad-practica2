@@ -123,3 +123,26 @@ def test_check_for_cooked_all_cooked(mock_ordered_products):
 
     # Verificamos que se configure el botón flf_btn en estado ACTIVE
     mock_ordered_products.flf_btn.config.assert_called_once_with(state=ACTIVE)
+
+def test_update_order_status_success(mock_ordered_products):
+    """
+    Verifica que, dada la selección de un ítem y un estado (e.g. 'Cooked'),
+    se llame a fac_db.update con los parámetros correctos.
+    """
+    # Arrange
+    mock_ordered_products.tr_view.focus.return_value = "item1"
+    mock_ordered_products.tr_view.item.return_value = ("Burger", "x1", "Cooked")
+    mock_ordered_products.t_num = 9
+    mock_ordered_products.fac_db = mock.Mock()
+
+    # Act
+    mock_ordered_products.update_order_status()
+
+    # Assert
+    mock_ordered_products.fac_db.update.assert_called_once()
+    # Verificar los argumentos por separado para evitar problemas con la indentación
+    call_args = mock_ordered_products.fac_db.update.call_args[0]
+    assert "UPDATE orders" in call_args[0]
+    assert "SET order_status = ?" in call_args[0]
+    assert "WHERE (table_num = ? AND product_name = ?)" in call_args[0]
+    assert call_args[1] == ("Cooked", 9, "Burger")
