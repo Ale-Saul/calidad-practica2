@@ -85,3 +85,23 @@ def test_populate_menu_empty(mock_ordered_products):
     
     # Assert: Verificar que no se realiza ninguna inserción en el Treeview
     mock_ordered_products.tr_view.insert.assert_not_called()
+
+def test_check_for_cooked_with_ordered(mock_ordered_products):
+    """
+    Verifica que si hay al menos un producto con estado 'Ordered',
+    el botón flf_btn se deshabilite (state=tk.DISABLED).
+    """
+    from tkinter import DISABLED
+
+    # Simulamos dos ítems en el Treeview: uno con "Ordered" y otro con "Cooked".
+    mock_ordered_products.tr_view.get_children.return_value = ["item1", "item2"]
+    mock_ordered_products.tr_view.item.side_effect = lambda item, option: (
+        ("Hamburger", "x2", "Ordered") if item == "item1" else ("Fries", "x3", "Cooked")
+    )
+
+    # Ejecutamos la función
+    mock_ordered_products.check_for_cooked()
+
+    # Verificamos que se configure el botón flf_btn en estado DISABLED
+    mock_ordered_products.flf_btn.config.assert_called_once_with(state=DISABLED)
+
