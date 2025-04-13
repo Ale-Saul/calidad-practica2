@@ -426,3 +426,23 @@ def test_fulfil_order_notebook_empty(mock_ordered_products):
     mock_ordered_products.destroy.assert_called_once()
     mock_ordered_products.root_frame.forget.assert_called_once_with(mock_ordered_products.tb)
     mock_ordered_products.f.assert_called_once()
+
+def test_selected_item(mock_ordered_products):
+    """
+    Verifica que, al llamar a selected_item(event),
+    se habilite cooked_btn (state=tk.ACTIVE) y se invoque check_for_cooked().
+    """
+    # Configurar el mock para que get_children devuelva una lista vacía
+    mock_ordered_products.tr_view.get_children.return_value = []
+    
+    # Crear un mock para check_for_cooked para evitar que se ejecute el método real
+    mock_ordered_products.check_for_cooked = mock.Mock()
+    
+    event = mock.Mock()
+    # Llamamos al método
+    mock_ordered_products.selected_item(event)
+    
+    # Verificamos que se llame cooked_btn.config con state=tk.ACTIVE
+    mock_ordered_products.cooked_btn.config.assert_called_with(state=tk.ACTIVE)
+    # Verificamos que se invoque check_for_cooked
+    mock_ordered_products.check_for_cooked.assert_called_once()
