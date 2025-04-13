@@ -172,3 +172,22 @@ def test_update_order_status_exception(mock_ordered_products):
         assert isinstance(call_args[0], Error)
         # Verificar que el mensaje del error es el esperado
         assert str(call_args[0]) == "Error de base de datos"
+    
+def test_get_product_price_success(mock_ordered_products):
+    """
+    Verifica que cuando la base de datos devuelve un precio para un producto,
+    get_product_price retorne dicho valor.
+    """
+    # Arrange
+    mock_ordered_products.fac_db = mock.Mock()
+    # Simulamos que se obtiene el precio 9.99 para "Pasta"
+    mock_ordered_products.fac_db.read_val.return_value = [(9.99,)]
+    
+    # Act
+    price = mock_ordered_products.get_product_price("Pasta")
+    
+    # Assert
+    assert price == 9.99
+    mock_ordered_products.fac_db.read_val.assert_called_once_with(
+        "SELECT product_price FROM menu_config WHERE product_name = ?", ("Pasta",)
+    )
