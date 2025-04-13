@@ -245,3 +245,54 @@ def test_store_cooked_orders_with_previous(mock_ordered_products):
         "INSERT INTO cooked_orders VALUES (?, ?, ?,  ?, ?)",
         (6, mock_ordered_products.t_num, "Fries", 3, 9.0)
     )
+
+def test_store_cooked_orders_multiple_items(mock_ordered_products):
+    """
+    Caso 3 (TC3): Múltiples ítems en el Treeview
+    Items:
+      ("Burger", "x2", "Cooked") -> precio unitario = 5.0
+      ("Fries", "x3", "Cooked") -> precio unitario = 2.0
+    fac_db.read_val(load_query) -> [] en cada iteración
+    """
+    # Arrange
+    mock_ordered_products.fac_db = mock.Mock()
+    # Queremos diferentes respuestas para cada llamada a get_product_price:
+    #   - "Burger" => 5.0, "Fries" => 2.0
+    def side_effect_price(product_name):
+        return 5.0 if product_name == "Burger" else 2.0
+    # Crear un mock para get_product_price
+    mock_ordered_products.get_product_price = mock.Mock(side_effect=side_effect_price)
+    
+    # Simulamos que no hay registros previos (retorna [] siempre)
+    mock_ordered_products.fac_db.read_val.return_value = []
+    
+    # Configuramos el Treeview con 2 ítems
+    mock_ordered_products.tr_view.get_children.return_value = ["item1", "item2"]
+    def side_effect_item(item, _):
+        return ("Burger", "x2", "Cooked") if item == "item1" else ("Fries", "x3", "Cooked")
+    mock_ordered_products.tr_view.item.side_effect = side_effect_item
+
+    # Para controlar la creación de id, fingimos que store_cooked_orders pregunta la DB cada vez.
+    # En este ejemplo, al retornar [] cada vez, siempre interpretará que no hay registros previos.
+    # Por lo tanto, ambos ítems obtendrán id=1. (Si tu lógica real incrementa uno a uno, habría que
+    # simularlo con side_effect. Mantengamos esta simplificación.)
+    
+    # Act
+    mock_ordered_products.store_cooked_orders()
+    
+    # Assert
+    # Verificamos que se llamara insert_spec_config 2 veces
+    assert mock_ordered_products.fac_db.insert_spec_config.call_count == 2
+    
+    # Revisamos que los parámetros coincidan con los valores esperados
+    calls = [
+        mock.call(
+            "INSERT INTO cooked_orders VALUES (?, ?, ?,  ?, ?)",
+            (1, mock_ordered_products.t_num, "Burger", 2, 10.0)
+        ),
+        mock.call(
+            "INSERT INTO cooked_orders VALUES (?, ?, ?,  ?, ?)",
+            (1, mock_ordered_products.t_num, "Fries", 3, 6.0)
+        )
+    ]
+    mock_ordered_products.fac_db.insert_spec_config.assert_has_calls(calls, any_order=False)
