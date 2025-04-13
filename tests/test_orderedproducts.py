@@ -73,3 +73,15 @@ def test_populate_menu_with_results(mock_ordered_products):
     ]
     mock_ordered_products.tr_view.insert.assert_has_calls(expected_calls, any_order=False)
     assert mock_ordered_products.tr_view.insert.call_count == 2
+
+def test_populate_menu_empty(mock_ordered_products):
+    # Arrange: Simular que la consulta devuelve una lista vacía
+    mock_ordered_products.fac_db = mock.Mock()
+    mock_ordered_products.fac_db.read_val.return_value = []
+    mock_ordered_products.tr_view = mock.Mock()
+    
+    # Act: Ejecutar populate_menu
+    mock_ordered_products.populate_menu()
+    
+    # Assert: Verificar que no se realiza ninguna inserción en el Treeview
+    mock_ordered_products.tr_view.insert.assert_not_called()
