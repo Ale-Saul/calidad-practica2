@@ -146,3 +146,29 @@ def test_update_order_status_success(mock_ordered_products):
     assert "SET order_status = ?" in call_args[0]
     assert "WHERE (table_num = ? AND product_name = ?)" in call_args[0]
     assert call_args[1] == ("Cooked", 9, "Burger")
+
+def test_update_order_status_exception(mock_ordered_products):
+    """
+    Verifica que, si se produce un Error de base de datos,
+    se capture la excepción y se imprima el mensaje de error.
+    """
+    # Arrange
+    mock_ordered_products.tr_view.focus.return_value = "item1"
+    mock_ordered_products.tr_view.item.return_value = ("Burger", "x1", "Cooked")
+    mock_ordered_products.t_num = 9
+
+    mock_ordered_products.fac_db = mock.Mock()
+    mock_ordered_products.fac_db.update.side_effect = Error("Error de base de datos")
+
+    # Usamos patch para capturar lo que se imprime
+    with mock.patch("builtins.print") as mock_print:
+        # Act
+        mock_ordered_products.update_order_status()
+        # Assert
+        # Verificar que print fue llamado una vez
+        assert mock_print.call_count == 1
+        # Verificar que el argumento pasado a print es un objeto Error
+        call_args = mock_print.call_args[0]
+        assert isinstance(call_args[0], Error)
+        # Verificar que el mensaje del error es el esperado
+        assert str(call_args[0]) == "Error de base de datos"
