@@ -319,3 +319,20 @@ def test_store_cooked_orders_exception(mock_ordered_products):
         assert str(call_args[0]) == "Database error"
         # Verificamos que NO se haya llamado a insert_spec_config
         mock_ordered_products.fac_db.insert_spec_config.assert_not_called()
+
+def test_update_order_db_success(mock_ordered_products):
+    """
+    Caso 1 (TB1): Se llama a update_order_db y se espera que 
+    se invoque delete_val con ("DELETE FROM orders WHERE order_status = ?", ["Cooked"])
+    sin imprimir ningún error.
+    """
+    # Arrange
+    mock_ordered_products.fac_db = mock.Mock()
+
+    # Act
+    mock_ordered_products.update_order_db()
+
+    # Assert
+    mock_ordered_products.fac_db.delete_val.assert_called_once_with(
+        "DELETE FROM orders WHERE order_status = ?", ["Cooked"]
+    )
