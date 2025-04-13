@@ -218,3 +218,30 @@ def test_store_cooked_orders_no_previous(mock_ordered_products):
         "INSERT INTO cooked_orders VALUES (?, ?, ?,  ?, ?)",
         (1, mock_ordered_products.t_num, "Burger", 2, 10.0)
     )
+
+def test_store_cooked_orders_with_previous(mock_ordered_products):
+    """
+    Caso 2 (TC2): Sí existe registro previo, último id = 5
+    Treeview con un ítem: ("Fries", "x3", "Cooked")
+    get_product_price("Fries") -> 3.0
+    fac_db.read_val(load_query) -> [(5, '...', '...', ...)]
+    """
+    # Arrange
+    mock_ordered_products.fac_db = mock.Mock()
+    mock_ordered_products.get_product_price = mock.Mock(return_value=3.0)
+
+    # Simulamos que ya existe un registro previo con id = 5
+    mock_ordered_products.fac_db.read_val.return_value = [(5, 1, "dummy", 1, 1.0)]
+    
+    mock_ordered_products.tr_view.get_children.return_value = ["item1"]
+    mock_ordered_products.tr_view.item.return_value = ("Fries", "x3", "Cooked")
+    
+    # Act
+    mock_ordered_products.store_cooked_orders()
+    
+    # Assert
+    # Se espera que el nuevo id sea 6 y or_total = 3 * 3.0 = 9.0
+    mock_ordered_products.fac_db.insert_spec_config.assert_called_once_with(
+        "INSERT INTO cooked_orders VALUES (?, ?, ?,  ?, ?)",
+        (6, mock_ordered_products.t_num, "Fries", 3, 9.0)
+    )
