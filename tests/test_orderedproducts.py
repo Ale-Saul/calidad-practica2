@@ -395,3 +395,34 @@ def test_fulfil_order_notebook_not_empty(mock_ordered_products):
     mock_ordered_products.root_frame.forget.assert_called_once_with(mock_ordered_products.tb)
     mock_ordered_products.f.assert_not_called()
 
+def test_fulfil_order_notebook_empty(mock_ordered_products):
+    """
+    Caso 2 (TB2): fulfil_order() se llama cuando root_frame.tabs() 
+    devuelve una lista vacía (ninguna pestaña).
+    Se espera:
+     - self.store_cooked_orders()
+     - self.update_order_db()
+     - self.destroy()
+     - self.root_frame.forget(self.tb)
+     - Sí se llama a self.f()
+    """
+    # Arrange
+    mock_ordered_products.store_cooked_orders = mock.Mock()
+    mock_ordered_products.update_order_db = mock.Mock()
+    mock_ordered_products.destroy = mock.Mock()
+    
+    # Agregar el atributo tb que falta
+    mock_ordered_products.tb = mock.Mock()
+    
+    # Simulamos que no quedan pestañas
+    mock_ordered_products.root_frame.tabs.return_value = []
+
+    # Act
+    mock_ordered_products.fulfil_order()
+
+    # Assert
+    mock_ordered_products.store_cooked_orders.assert_called_once()
+    mock_ordered_products.update_order_db.assert_called_once()
+    mock_ordered_products.destroy.assert_called_once()
+    mock_ordered_products.root_frame.forget.assert_called_once_with(mock_ordered_products.tb)
+    mock_ordered_products.f.assert_called_once()
