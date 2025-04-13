@@ -53,3 +53,23 @@ def test_init_database_success(mock_ordered_products):
         assert "order_quantity integer NOT NULL" in call_args
         assert "order_price integer NOT NULL" in call_args
 
+def test_populate_menu_with_results(mock_ordered_products):
+    # Arrange: Simular que la consulta devuelve dos registros
+    query_result = [
+        (1, 1, "Hamburger", 2, "Ordered"),
+        (2, 1, "Fries", 3, "Cooked")
+    ]
+    mock_ordered_products.fac_db = mock.Mock()
+    mock_ordered_products.fac_db.read_val.return_value = query_result
+    mock_ordered_products.tr_view = mock.Mock()
+    
+    # Act: Ejecutar la función populate_menu
+    mock_ordered_products.populate_menu()
+    
+    # Assert: Verificar que se insertaron los items correctos en el Treeview
+    expected_calls = [
+        mock.call('', tk.END, values=("Hamburger", "x2", "Ordered")),
+        mock.call('', tk.END, values=("Fries", "x3", "Cooked"))
+    ]
+    mock_ordered_products.tr_view.insert.assert_has_calls(expected_calls, any_order=False)
+    assert mock_ordered_products.tr_view.insert.call_count == 2
