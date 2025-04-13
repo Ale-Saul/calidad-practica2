@@ -191,3 +191,30 @@ def test_get_product_price_success(mock_ordered_products):
     mock_ordered_products.fac_db.read_val.assert_called_once_with(
         "SELECT product_price FROM menu_config WHERE product_name = ?", ("Pasta",)
     )
+
+def test_store_cooked_orders_no_previous(mock_ordered_products):
+    """
+    Caso 1 (TC1): No existe ningún registro previo en cooked_orders
+    Treeview con un ítem: ("Burger", "x2", "Cooked")
+    get_product_price("Burger") -> 5.0
+    fac_db.read_val(load_query) -> []
+    """
+    # Arrange
+    mock_ordered_products.fac_db = mock.Mock()
+    mock_ordered_products.get_product_price = mock.Mock(return_value=5.0)
+    
+    # Simulamos la ausencia de registros previos
+    mock_ordered_products.fac_db.read_val.return_value = []
+    
+    mock_ordered_products.tr_view.get_children.return_value = ["item1"]
+    mock_ordered_products.tr_view.item.return_value = ("Burger", "x2", "Cooked")
+    
+    # Act
+    mock_ordered_products.store_cooked_orders()
+    
+    # Assert
+    # Se espera que order_id sea 1, t_num = 1, or_name = "Burger", or_quantity = 2, or_total = 10.0
+    mock_ordered_products.fac_db.insert_spec_config.assert_called_once_with(
+        "INSERT INTO cooked_orders VALUES (?, ?, ?,  ?, ?)",
+        (1, mock_ordered_products.t_num, "Burger", 2, 10.0)
+    )
