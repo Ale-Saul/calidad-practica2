@@ -105,3 +105,21 @@ def test_check_for_cooked_with_ordered(mock_ordered_products):
     # Verificamos que se configure el botón flf_btn en estado DISABLED
     mock_ordered_products.flf_btn.config.assert_called_once_with(state=DISABLED)
 
+def test_check_for_cooked_all_cooked(mock_ordered_products):
+    """
+    Verifica que si todos los productos tienen estado distinto de 'Ordered'
+    (ejemplo 'Cooked'), el botón flf_btn se habilite (state=tk.ACTIVE).
+    """
+    from tkinter import ACTIVE
+
+    # Simulamos dos ítems en el Treeview: ambos con "Cooked".
+    mock_ordered_products.tr_view.get_children.return_value = ["item1", "item2"]
+    mock_ordered_products.tr_view.item.side_effect = lambda item, option: (
+        "Fries", "x3", "Cooked"
+    )
+
+    # Ejecutamos la función
+    mock_ordered_products.check_for_cooked()
+
+    # Verificamos que se configure el botón flf_btn en estado ACTIVE
+    mock_ordered_products.flf_btn.config.assert_called_once_with(state=ACTIVE)
