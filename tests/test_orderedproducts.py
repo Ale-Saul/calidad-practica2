@@ -336,3 +336,29 @@ def test_update_order_db_success(mock_ordered_products):
     mock_ordered_products.fac_db.delete_val.assert_called_once_with(
         "DELETE FROM orders WHERE order_status = ?", ["Cooked"]
     )
+
+def test_update_order_db_exception(mock_ordered_products):
+    """
+    Caso 2 (TB2): Se llama a update_order_db y fac_db.delete_val lanza Error("Database error").
+    Se espera que se capture la excepción e imprima 'Database error'.
+    """
+    # Arrange
+    mock_ordered_products.fac_db = mock.Mock()
+    mock_ordered_products.fac_db.delete_val.side_effect = Error("Database error")
+
+    with mock.patch("builtins.print") as mock_print:
+        # Act
+        mock_ordered_products.update_order_db()
+
+        # Assert
+        # Verificar que print fue llamado una vez
+        assert mock_print.call_count == 1
+        # Verificar que el argumento pasado a print es un objeto Error
+        call_args = mock_print.call_args[0]
+        assert isinstance(call_args[0], Error)
+        # Verificar que el mensaje del error es el esperado
+        assert str(call_args[0]) == "Database error"
+        # Verificar que se llamó a delete_val con los parámetros correctos
+        mock_ordered_products.fac_db.delete_val.assert_called_once_with(
+            "DELETE FROM orders WHERE order_status = ?", ["Cooked"]
+        )
