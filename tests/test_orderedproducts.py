@@ -296,3 +296,26 @@ def test_store_cooked_orders_multiple_items(mock_ordered_products):
         )
     ]
     mock_ordered_products.fac_db.insert_spec_config.assert_has_calls(calls, any_order=False)
+
+def test_store_cooked_orders_exception(mock_ordered_products):
+    """
+    Caso 4 (TC4): Se lanza una excepción al consultar la base de datos
+    """
+    # Arrange
+    mock_ordered_products.fac_db = mock.Mock()
+    mock_ordered_products.fac_db.read_val.side_effect = Error("Database error")
+    mock_ordered_products.tr_view.get_children.return_value = ["item1"]
+    mock_ordered_products.tr_view.item.return_value = ("Burger", "x2", "Cooked")
+
+    # Act & Assert
+    with mock.patch("builtins.print") as mock_print:
+        mock_ordered_products.store_cooked_orders()
+        # Verificar que print fue llamado una vez
+        assert mock_print.call_count == 1
+        # Verificar que el argumento pasado a print es un objeto Error
+        call_args = mock_print.call_args[0]
+        assert isinstance(call_args[0], Error)
+        # Verificar que el mensaje del error es el esperado
+        assert str(call_args[0]) == "Database error"
+        # Verificamos que NO se haya llamado a insert_spec_config
+        mock_ordered_products.fac_db.insert_spec_config.assert_not_called()
