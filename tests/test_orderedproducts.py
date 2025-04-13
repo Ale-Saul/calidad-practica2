@@ -446,3 +446,36 @@ def test_selected_item(mock_ordered_products):
     mock_ordered_products.cooked_btn.config.assert_called_with(state=tk.ACTIVE)
     # Verificamos que se invoque check_for_cooked
     mock_ordered_products.check_for_cooked.assert_called_once()
+
+def test_change_state(mock_ordered_products):
+    """
+    Caso (TB1): Se selecciona un ítem en el Treeview con valores ("Burger", "x1", "Ordered")
+    Al llamar a change_state(), el ítem debe actualizarse a ("Burger", "x1", "Cooked")
+    y se deben invocar update_order_status y check_for_cooked.
+    """
+    # Arrange
+    mock_ordered_products.tr_view.focus.return_value = "item1"
+    mock_ordered_products.tr_view.item.return_value = ("Burger", "x1", "Ordered")
+
+    # Parches para verificar que se llaman después
+    mock_ordered_products.update_order_status = mock.Mock()
+    mock_ordered_products.check_for_cooked = mock.Mock()
+
+    # Act
+    mock_ordered_products.change_state()
+
+    # Assert
+    # Verificar que se llamó a item dos veces
+    assert mock_ordered_products.tr_view.item.call_count == 2
+    
+    # Verificar la primera llamada (para obtener los valores)
+    mock_ordered_products.tr_view.item.assert_any_call("item1", "values")
+    
+    # Verificar la segunda llamada (para actualizar los valores)
+    mock_ordered_products.tr_view.item.assert_any_call(
+        "item1", text="", values=("Burger", "x1", "Cooked")
+    )
+    
+    # Verificar que se llamaron los otros métodos
+    mock_ordered_products.update_order_status.assert_called_once()
+    mock_ordered_products.check_for_cooked.assert_called_once()
