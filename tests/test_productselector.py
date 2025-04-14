@@ -87,7 +87,7 @@ def test_retrieve_products_executes_query(mock_product_selector):
     
     # Verificar que se llamó a read_val con la consulta correcta
     # Usamos assert_any_call en lugar de assert_called_with
-    mock_product_selector.fac_db.read_val.assert_any_call("SELECT * FROM menu_config")
+    mock_product_selector.fac_db.read_val.assert_any_call("""SELECT * FROM menu_config""")
 
 
 def test_retrieve_products(mock_product_selector):

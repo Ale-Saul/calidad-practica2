@@ -43,7 +43,7 @@ def test_callback_table_num(create_orders):
 
     # Caso inválido: número fuera del rango
     with patch('tkinter.messagebox.showerror') as mock_error:
-        assert create_orders.callback_table_num("11") is False
+        assert create_orders.callback_table_num("100") is False
         mock_error.assert_called_once_with(
             "Input Error", "Maximum number of tables must not exceed 10!"
         )

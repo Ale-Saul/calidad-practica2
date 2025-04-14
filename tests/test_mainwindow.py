@@ -51,9 +51,9 @@ def test_check_databases(mock_main_window):
     
     # Verificar que se llamó a read_val 3 veces con las consultas correctas
     expected_calls = [
-        "SELECT * FROM menu_config",
-        "SELECT * FROM orders",
-        "SELECT * FROM cooked_orders"
+        """SELECT * FROM menu_config""",
+        """SELECT * FROM orders""",
+        """SELECT * FROM cooked_orders"""
     ]
     
     # Obtener las llamadas reales
