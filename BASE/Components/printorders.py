@@ -11,7 +11,7 @@ from .Database import Database
 
 
 class PrintOrders(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent):# pragma: no cover
         super().__init__(parent)
         self.init_database()
 

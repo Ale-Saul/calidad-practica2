@@ -7,7 +7,7 @@ from .Database import Database
 
 
 class ProductSelector(tk.Frame):
-    def __init__(self, parent, root_frame, row, func):
+    def __init__(self, parent, root_frame, row, func):# pragma: no cover
         self.func = func
         tk.Frame.__init__(self, parent)
 

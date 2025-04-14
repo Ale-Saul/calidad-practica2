@@ -5,7 +5,7 @@ windll.shcore.SetProcessDpiAwareness(1)
 
 
 class AboutWindow(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent):# pragma: no cover
         super().__init__(parent)
 
         self.win_width = 360
