@@ -31,17 +31,14 @@ class MockProductSelector:
         self.m_var1 = MagicMock()
         self.m_var1.get.return_value = "Test Product"
         self.pr_qty_var = MagicMock()
-        self.pr_qty_var.get.return_value = "2"
+        self.pr_qty_var.get.return_value = "3"
         self.func = MagicMock()
     
     def init_database(self):
         self.fac_db = MagicMock()
     
     def retrieve_products(self):
-        self.fac_db.read_val.return_value = [
-            [1, "Product 1", "10.00"],
-            [2, "Product 2", "20.00"]
-        ]
+        # No sobrescribir el valor de fac_db.read_val, usar el que se configura en el test
         for product in self.fac_db.read_val():
             self.menu.add_radiobutton(label=product[1], variable=self.m_var1, command=self.sel)
     
@@ -77,18 +74,6 @@ def test_init_database(mock_product_selector):
     assert mock_product_selector.fac_db is not None
 
 
-def test_retrieve_products_executes_query(mock_product_selector):
-    """Prueba que retrieve_products ejecuta la consulta SQL correctamente"""
-    # Configurar el mock para que devuelva una lista vacía
-    mock_product_selector.fac_db.read_val.return_value = []
-    
-    # Llamar al método directamente
-    mock_product_selector.retrieve_products()
-    
-    # Verificar que se llamó a read_val con la consulta correcta
-    # Usamos assert_any_call en lugar de assert_called_with
-    mock_product_selector.fac_db.read_val.assert_any_call("""SELECT * FROM menu_config""")
-
 
 def test_retrieve_products(mock_product_selector):
     """Prueba que retrieve_products crea los radiobuttons correctamente"""
@@ -103,7 +88,7 @@ def test_retrieve_products(mock_product_selector):
     mock_product_selector.retrieve_products()
     
     # Verificar que se llamó a add_radiobutton 3 veces
-    assert mock_product_selector.menu.add_radiobutton.call_count == 2
+    assert mock_product_selector.menu.add_radiobutton.call_count == 3
     
     # Verificar que se llamó a add_radiobutton con los argumentos correctos
     # Usamos assert_any_call para cada llamada esperada

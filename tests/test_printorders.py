@@ -296,3 +296,4 @@ def test_destroy_calls_super_destroy(mock_print_orders):
     with mock.patch.object(type(mock_print_orders), 'destroy', autospec=True) as mock_super_destroy:
         mock_print_orders.destroy()
         mock_super_destroy.assert_called_once_with(mock_print_orders)
+
