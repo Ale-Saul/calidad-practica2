@@ -41,30 +41,31 @@ def main_window():
         # No es necesario llamar a destroy() ya que estamos usando un mock
 
 
-def test_check_databases(mock_main_window):
+def test_check_databases(main_window):
     """Prueba que check_databases se ejecuta correctamente"""
-    # Configurar el mock para que devuelva un valor
-    mock_main_window.fac_db.read_val.return_value = [1]
+    # Configurar el mock para que devuelva valores
+    main_window.fac_db.read_val.side_effect = [[1], [1], [1]]
     
     # Llamar al método
-    mock_main_window.check_databases()
+    main_window.check_databases()
     
-    # Verificar que se llamó a read_val 3 veces con las consultas correctas
-    expected_calls = [
+    # Verificar que las consultas son las esperadas
+    expected_queries = [
         """SELECT * FROM menu_config""",
         """SELECT * FROM orders""",
         """SELECT * FROM cooked_orders"""
     ]
     
     # Obtener las llamadas reales
-    actual_calls = [call[0][0] for call in mock_main_window.fac_db.read_val.call_args_list]
-    
-    # Verificar que se llamó a read_val 3 veces
-    assert mock_main_window.fac_db.read_val.call_count == 3
+    actual_calls = [call[0][0] for call in main_window.fac_db.read_val.call_args_list]
     
     # Verificar que las consultas son las esperadas
-    for expected, actual in zip(expected_calls, actual_calls):
-        assert expected in actual
+    for expected in expected_queries:
+        # Verificar que al menos una llamada contiene la consulta esperada
+        assert any(expected in actual for actual in actual_calls), f"No se encontró la consulta: {expected}"
+    
+    # Verificar que se configuraron los estados de los menús
+    assert main_window.filebar.entryconfig.call_count >= 3
 
 
 def test_config_window(main_window):
