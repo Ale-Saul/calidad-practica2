@@ -1,26 +1,70 @@
 import pytest
 from unittest.mock import MagicMock, patch
+import os
+import sys
+
+# Agregar el directorio BASE al path para poder importar los módulos
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from BASE.Components.mainwindow import MainWindow
 
 
 @pytest.fixture
 def main_window():
     """Fixture para inicializar la ventana principal"""
+    # Mockear todas las dependencias necesarias
     with patch("BASE.Components.mainwindow.tk.Tk", MagicMock()), \
+         patch("BASE.Components.mainwindow.ttk.Frame", MagicMock()), \
+         patch("BASE.Components.mainwindow.tk.Menu", MagicMock()), \
          patch("BASE.Components.mainwindow.Image.open", MagicMock()), \
          patch("BASE.Components.mainwindow.ImageTk.PhotoImage", MagicMock()), \
          patch("BASE.Components.mainwindow.Database", MagicMock()), \
-         patch("BASE.Components.mainwindow.MainWindow.iconphoto", MagicMock()):
+         patch("BASE.Components.mainwindow.MainWindow.iconphoto", MagicMock()), \
+         patch("BASE.Components.mainwindow.MainWindow.geometry", MagicMock()), \
+         patch("BASE.Components.mainwindow.MainWindow.resizable", MagicMock()), \
+         patch("BASE.Components.mainwindow.MainWindow.title", MagicMock()), \
+         patch("BASE.Components.mainwindow.MainWindow.winfo_screenwidth", return_value=800), \
+         patch("BASE.Components.mainwindow.MainWindow.winfo_screenheight", return_value=600), \
+         patch("BASE.Components.mainwindow.os.path.join", return_value="fake_path"), \
+         patch("BASE.Components.mainwindow.os.path.dirname", return_value="fake_dir"):
+        
+        # Crear la instancia de MainWindow
         window = MainWindow()
+        
+        # Configurar atributos adicionales que podrían ser necesarios
+        window.m_frame = MagicMock()
+        window.menubar = MagicMock()
+        window.filebar = MagicMock()
+        window.fac_db = MagicMock()
+        
         yield window
-        window.destroy()
+        
+        # No es necesario llamar a destroy() ya que estamos usando un mock
 
 
-def test_check_databases(main_window):
+def test_check_databases(mock_main_window):
     """Prueba que check_databases se ejecuta correctamente"""
-    with patch.object(main_window.fac_db, 'read_val', return_value=[1]) as mock_read:
-        main_window.check_databases()
-        assert mock_read.call_count == 3  # Se llama 3 veces para las 3 consultas
+    # Configurar el mock para que devuelva un valor
+    mock_main_window.fac_db.read_val.return_value = [1]
+    
+    # Llamar al método
+    mock_main_window.check_databases()
+    
+    # Verificar que se llamó a read_val 3 veces con las consultas correctas
+    expected_calls = [
+        "SELECT * FROM menu_config",
+        "SELECT * FROM orders",
+        "SELECT * FROM cooked_orders"
+    ]
+    
+    # Obtener las llamadas reales
+    actual_calls = [call[0][0] for call in mock_main_window.fac_db.read_val.call_args_list]
+    
+    # Verificar que se llamó a read_val 3 veces
+    assert mock_main_window.fac_db.read_val.call_count == 3
+    
+    # Verificar que las consultas son las esperadas
+    for expected, actual in zip(expected_calls, actual_calls):
+        assert expected in actual
 
 
 def test_config_window(main_window):
