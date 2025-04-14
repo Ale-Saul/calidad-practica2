@@ -72,3 +72,100 @@ def test_create_table_success(mock_db):
     # Verificar que se llamó a execute y commit
     mock_db.cursor.execute.assert_called_once_with(test_query)
     mock_db.conn.commit.assert_called_once()
+
+def test_create_table_error(mock_db):
+    """Prueba que create_table maneja correctamente los errores"""
+    mock_db.cursor.execute.side_effect = Error("Test error")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.create_table("CREATE TABLE test_table (id INTEGER PRIMARY KEY)")
+    
+    # Verificar que no se llamó a commit cuando hay error
+    mock_db.conn.commit.assert_not_called()
+
+def test_insert_spec_config_success(mock_db):
+    """Prueba que insert_spec_config inserta datos correctamente"""
+    test_query = "INSERT INTO test_table (id, name) VALUES (?, ?)"
+    test_values = (1, "test_name")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.insert_spec_config(test_query, test_values)
+    
+    # Verificar que se llamó a execute y commit
+    mock_db.cursor.execute.assert_called_once_with(test_query, test_values)
+    mock_db.conn.commit.assert_called_once()
+
+def test_insert_spec_config_error(mock_db):
+    """Prueba que insert_spec_config maneja correctamente los errores"""
+    mock_db.cursor.execute.side_effect = Error("Test error")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.insert_spec_config("INSERT INTO test_table VALUES (?)", (1,))
+    
+    # Verificar que no se llamó a commit cuando hay error
+    mock_db.conn.commit.assert_not_called()
+
+def test_update_success(mock_db):
+    """Prueba que update actualiza datos correctamente"""
+    test_query = "UPDATE test_table SET name = ? WHERE id = ?"
+    test_values = ("new_name", 1)
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.update(test_query, test_values)
+    
+    # Verificar que se llamó a execute y commit
+    mock_db.cursor.execute.assert_called_once_with(test_query, test_values)
+    mock_db.conn.commit.assert_called_once()
+
+def test_update_error(mock_db):
+    """Prueba que update maneja correctamente los errores"""
+    mock_db.cursor.execute.side_effect = Error("Test error")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.update("UPDATE test_table SET name = ?", ("test_name",))
+    
+    # Verificar que no se llamó a commit cuando hay error
+    mock_db.conn.commit.assert_not_called()
+
+def test_delete_val_success(mock_db):
+    """Prueba que delete_val elimina datos correctamente"""
+    test_query = "DELETE FROM test_table WHERE id = ?"
+    test_id = 1
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.delete_val(test_query, test_id)
+    
+    # Verificar que se llamó a execute y commit
+    mock_db.cursor.execute.assert_called_once_with(test_query, test_id)
+    mock_db.conn.commit.assert_called_once()
+
+def test_delete_val_error(mock_db):
+    """Prueba que delete_val maneja correctamente los errores"""
+    mock_db.cursor.execute.side_effect = Error("Test error")
+    
+    # Limpiar el historial de llamadas antes de nuestra prueba
+    mock_db.cursor.execute.reset_mock()
+    mock_db.conn.commit.reset_mock()
+    
+    mock_db.delete_val("DELETE FROM test_table WHERE id = ?", 1)
+    
+    # Verificar que no se llamó a commit cuando hay error
+    mock_db.conn.commit.assert_not_called() 
