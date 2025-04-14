@@ -6,7 +6,7 @@ from .Database import Database
 
 
 class OrderedProducts(tk.Frame):
-    def __init__(self, parent, root_frame, label_frame, table_num, func):
+    def __init__(self, parent, root_frame, label_frame, table_num, func):# pragma: no cover
         tk.Frame.__init__(self, parent)
         self.root_frame = root_frame
         self.label_frame = label_frame

@@ -283,9 +283,11 @@ class ConfigWindow(tk.Toplevel):
             sel_pr_txt = f"{sel_item_val[0]}) {sel_item_val[1]} {sel_item_val[2]}"
             self.sel_pr_id_lbl.config(text="")
             self.sel_pr_id_lbl.config(text=sel_pr_txt)
-            self.tr_view_remove.config(state=tk.ACTIVE)
+            self.tr_view_remove.config(state=tk.NORMAL)
         except IndexError as e:
             print(e)
+            self.tr_view_remove.config(state=tk.DISABLED)
+            self.sel_pr_id_lbl.config(text="")
 
     def fac_conf_clear(self):
         self.fc_name_ent.delete(0, tk.END)
@@ -334,7 +336,7 @@ class ConfigWindow(tk.Toplevel):
             return False
 
     def save_fac_config(self):
-        load_query = """SELECT * FROM fac_config"""
+        load_query = "SELECT * FROM fac_config"
         result = self.fac_db.read_val(load_query)
 
         fac_name = self.fc_name_ent.get()
@@ -343,18 +345,12 @@ class ConfigWindow(tk.Toplevel):
 
         if fac_name and table_num and seat_num:
             if len(result) >= 1:
-                update_query = """UPDATE fac_config
-                SET fac_name = ?,
-                table_num = ?,
-                seat_num = ?,
-                WHERE id = ?
-                """
-                self.fac_db.update(
-                    update_query, (fac_name, table_num, seat_num, 1))
+                update_query = "UPDATE fac_config SET fac_name = ?, table_num = ?, seat_num = ? WHERE id = ?"
+                self.fac_db.update(update_query, (fac_name, table_num, seat_num, 1))
             else:
-                spec_insert_query = """INSERT INTO fac_config VALUES (?, ?, ?, ?)"""
-                self.fac_db.insert_spec_config(
-                    spec_insert_query, (1, fac_name, table_num, seat_num))
+                spec_insert_query = "INSERT INTO fac_config VALUES (?, ?, ?, ?)"
+                self.fac_db.insert_spec_config(spec_insert_query, (1, fac_name, table_num, seat_num))
+
             self.check_if_empty_database()
             self.check_if_empty_fc_entry()
         else:
@@ -398,6 +394,8 @@ class ConfigWindow(tk.Toplevel):
 
                 self.fac_db.insert_spec_config(
                     spec_insert_query, (pr_ind, food_name, food_price))
+            else:
+                messagebox.showerror("Invalid input", "Producto inválido.")
         else:
             er_msg = "Please fill \"Name of the product \" and \"Price of the product\" fields!"
             messagebox.showerror("Empty input fields", er_msg)
