@@ -58,6 +58,39 @@ Run the command below to initialize the app:
 ```
  python BASE/Components/rms.py
 ```
+
+## Pruebas Unitarias con pytest
+
+1. Instalación de herramientas
+
+Ejecuta el siguiente comando para instalar pytest y pytest-cov:
+```
+pip install pytest pytest-cov
+```
+También puedes instalarlo desde requirements.txt si ya está incluido allí.
+
+2. Ejecutar pruebas unitarias
+
+Para ejecutar todas las pruebas unitarias del proyecto, usa:
+```
+pytest
+```
+3. Medir la cobertura de código
+
+Para medir la cobertura de las pruebas:
+```
+pytest --cov=.
+```
+Esto mostrará un resumen de cuántas líneas de código fueron cubiertas por las pruebas.
+
+4. Generar reporte en archivo
+
+Si deseas generar un reporte HTML con la cobertura:
+```
+pytest --cov=. --cov-report html
+```
+Luego, abre el archivo htmlcov/index.html en tu navegador para ver los resultados visualmente.
+
 1. **Initial run**
 
 - When started Main Window will pop up. Through its filebar we can access all the necessary windows.
